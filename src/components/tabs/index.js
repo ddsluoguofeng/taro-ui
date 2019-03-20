@@ -141,7 +141,8 @@ export default class AtTabs extends AtComponent {
       animated,
       tabList,
       scroll,
-      current
+      current,
+      sticky
     } = this.props
     const {
       _scrollLeft,
@@ -198,26 +199,41 @@ export default class AtTabs extends AtComponent {
         style={this.mergeStyle(heightStyle, customStyle)}
       >
         {
-          scroll
-            ? <ScrollView
-              id={this._tabId}
-              className='at-tabs__header'
-              style={heightStyle}
-              scrollX={scrollX}
-              scrollY={scrollY}
-              scrollWithAnimation
-              scrollLeft={_scrollLeft}
-              scrollTop={_scrollTop}
-              scrollIntoView={_scrollIntoView}
-            >
-              {tabItems}
-            </ScrollView>
-            : <View
-              id={this._tabId}
-              className='at-tabs__header'
-            >
-              {tabItems}
-            </View>
+          scroll && sticky && <ScrollView
+                                id={this._tabId}
+                                className='at-tabs__header_sticky'
+                                style={heightStyle}
+                                scrollX={scrollX}
+                                scrollY={scrollY}
+                                scrollWithAnimation
+                                scrollLeft={_scrollLeft}
+                                scrollTop={_scrollTop}
+                                scrollIntoView={_scrollIntoView}
+                              >
+                                {tabItems}
+                              </ScrollView>
+        }
+        {
+          scroll && !sticky && <ScrollView
+                                  id={this._tabId}
+                                  className='at-tabs__header'
+                                  style={heightStyle}
+                                  scrollX={scrollX}
+                                  scrollY={scrollY}
+                                  scrollWithAnimation
+                                  scrollLeft={_scrollLeft}
+                                  scrollTop={_scrollTop}
+                                  scrollIntoView={_scrollIntoView}
+                                >
+                                  {tabItems}
+                                </ScrollView>
+        }
+        {
+           !scroll && !sticky && <View id={this._tabId} className='at-tabs__header'>{tabItems}</View>
+        }
+
+        {
+           !scroll && sticky && <View id={this._tabId} className='at-tabs__header_sticky'>{tabItems}</View>
         }
         <View
           className='at-tabs__body'
