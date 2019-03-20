@@ -26,7 +26,7 @@ export default class AtTabs extends AtComponent {
     // // 滑动时间间隔
     // this._interval = 0
     // // 是否已经在滑动
-    // this._isMoving = false
+    this._isMoving = false
   }
 
   updateState = idx => {
@@ -127,7 +127,9 @@ export default class AtTabs extends AtComponent {
         this._isMoving = true
         this.handleClick(current - 1);        
       }
+      this._isMoving = false
     }
+    
   }
 
   componentWillReceiveProps (nextProps) {

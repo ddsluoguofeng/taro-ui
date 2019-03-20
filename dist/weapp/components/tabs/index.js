@@ -122,8 +122,8 @@ export default class AtTabs extends AtComponent {
     // console.log("=======handleTouchMove=====this._isMoving====this._interval===>",this._isMoving,this._interval);
     // console.log("=======handleTouchMove====moveDistance===current==>",moveDistance,current,maxIndex)
     if (!this._isMoving ) {     
-      // console.log("======计算==向左====>",current + 1,maxIndex,moveDistance,"<= -40")
-      // console.log("======计算==向右====>",current -1,maxIndex,moveDistance,">=40")
+      console.log("======计算==向左====>",current + 1,maxIndex,moveDistance,"<= -40")
+      console.log("======计算==向右====>",current -1,maxIndex,moveDistance,">=40")
       // 向左滑动
       if ( moveDistanceY <=15 && moveDistanceY >=-15  && current + 1 < maxIndex && moveDistance <= -40) {
         // console.log("======向左滑动========>")
@@ -141,7 +141,7 @@ export default class AtTabs extends AtComponent {
     // console.log("======handleTouchEnd==3======>")
     // clearInterval(this._timer)
     // this._interval = 0
-    // this._isMoving = false
+    this._isMoving = false
   }
 
   componentWillReceiveProps (nextProps) {
