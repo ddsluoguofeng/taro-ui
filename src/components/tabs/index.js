@@ -20,12 +20,13 @@ export default class AtTabs extends AtComponent {
     this._tabId = isTest() ? 'tabs-AOTU2018' : uuid()
     // 触摸时的原点
     this._touchDot = 0
-    // 定时器
-    this._timer = null
-    // 滑动时间间隔
-    this._interval = 0
-    // 是否已经在滑动
-    this._isMoving = false
+    this._touchDotY = 0
+    // // 定时器
+    // this._timer = null
+    // // 滑动时间间隔
+    // this._interval = 0
+    // // 是否已经在滑动
+    // this._isMoving = false
   }
 
   updateState = idx => {
@@ -65,47 +66,68 @@ export default class AtTabs extends AtComponent {
     const { swipeable, tabDirection } = this.props
     if (!swipeable || tabDirection === 'vertical') return
     // 获取触摸时的原点
-    this._touchDot = e.touches[0].pageX
-    // 使用js计时器记录时间
-    this._timer = setInterval(() => {
-      this._interval++
-    }, 100)
+    this._touchDot = e.touches[0].pageX;
+    this._touchDotY = e.touches[0].pageY;
+
+    // // 使用js计时器记录时间
+    // this._timer = setInterval(() => {
+    //   this._interval++
+    // }, 100)
   }
 
-  handleTouchMove (e) {
-    const {
-      swipeable,
-      tabDirection,
-      current,
-      tabList
-    } = this.props
-    if (!swipeable || tabDirection === 'vertical') return
+  // handleTouchMove (e) {
+  //   const {
+  //     swipeable,
+  //     tabDirection,
+  //     current,
+  //     tabList
+  //   } = this.props
+  //   if (!swipeable || tabDirection === 'vertical') return
 
-    const touchMove = e.touches[0].pageX
-    const moveDistance = touchMove - this._touchDot
-    const maxIndex = tabList.length
+  //   const touchMove = e.touches[0].pageX
+  //   const moveDistance = touchMove - this._touchDot
+  //   const maxIndex = tabList.length
 
-    if (!this._isMoving && this._interval < MAX_INTERVAL) {
-      // 向左滑动
-      if (current + 1 < maxIndex && moveDistance <= -MIN_DISTANCE) {
-        this._isMoving = true
-        this.handleClick(current + 1)
+  //   if (!this._isMoving && this._interval < MAX_INTERVAL) {
+  //     // 向左滑动
+  //     if (current + 1 < maxIndex && moveDistance <= -MIN_DISTANCE) {
+  //       this._isMoving = true
+  //       this.handleClick(current + 1)
 
-      // 向右滑动
-      } else if (current - 1 >= 0 && moveDistance >= MIN_DISTANCE) {
-        this._isMoving = true
-        this.handleClick(current - 1)
-      }
-    }
-  }
+  //     // 向右滑动
+  //     } else if (current - 1 >= 0 && moveDistance >= MIN_DISTANCE) {
+  //       this._isMoving = true
+  //       this.handleClick(current - 1)
+  //     }
+  //   }
+  // }
 
   handleTouchEnd () {
-    const { swipeable, tabDirection } = this.props
+    // console.log("======handleTouchEnd====1====>",e)
+    const { swipeable, tabDirection, current,tabList } = this.props
+    // console.log("======handleTouchEnd====2=swipeable====tabDirection=>",swipeable,tabDirection)
     if (!swipeable || tabDirection === 'vertical') return
-
-    clearInterval(this._timer)
-    this._interval = 0
-    this._isMoving = false
+    
+    const touchMove = e.changedTouches[0].pageX;
+    const touchMoveY = e.changedTouches[0].pageY
+    const moveDistance = touchMove - this._touchDot;
+    const moveDistanceY = touchMoveY - this._touchDotY;
+    const maxIndex = tabList.length
+    if (!this._isMoving ) {     
+      // console.log("======计算==向左====>",current + 1,maxIndex,moveDistance,"<= -40")
+      // console.log("======计算==向右====>",current -1,maxIndex,moveDistance,">=40")
+      // 向左滑动
+      if ( moveDistanceY <=15 && moveDistanceY >=-15  && current + 1 < maxIndex && moveDistance <= -40) {
+        // console.log("======向左滑动========>")
+        this._isMoving = true
+        this.handleClick(current + 1)        
+      // 向右滑动
+      } else if (moveDistanceY <=15 && moveDistanceY >=-15 && current - 1 >= 0 && moveDistance >= 40) {
+        // console.log("======向右滑动========>")
+        this._isMoving = true
+        this.handleClick(current - 1);        
+      }
+    }
   }
 
   componentWillReceiveProps (nextProps) {
@@ -235,15 +257,17 @@ export default class AtTabs extends AtComponent {
         {
            !scroll && sticky && <View id={this._tabId} className='at-tabs__header_sticky'>{tabItems}</View>
         }
-        <View
-          className='at-tabs__body'
-          onTouchStart={this.handleTouchStart.bind(this)}
-          onTouchEnd={this.handleTouchEnd.bind(this)}
-          onTouchMove={this.handleTouchMove.bind(this)}
-          style={this.mergeStyle(bodyStyle, heightStyle)}
-        >
-          <View className='at-tabs__underline' style={underlineStyle}></View>
-          {this.props.children}
+        <View style=" overflow:hidden;width:100%;height:100%;">
+          <View
+            className='at-tabs__body'
+            onTouchStart={this.handleTouchStart.bind(this)}
+            onTouchEnd={this.handleTouchEnd.bind(this)}
+            onTouchMove={this.handleTouchMove.bind(this)}
+            style={this.mergeStyle(bodyStyle, heightStyle)}
+          >
+            <View className='at-tabs__underline' style={underlineStyle}></View>
+            {this.props.children}
+          </View>
         </View>
       </View>
     )

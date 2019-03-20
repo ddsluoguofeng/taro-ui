@@ -17,7 +17,8 @@ export default class AtTabs extends AtComponent {
     }
     this._tabId = isTest() ? 'tabs-AOTU2018' : uuid()
     // 触摸时的原点
-    this._touchDot = 0
+    this._touchDot = 0;
+    this._touchDotY = 0
     // 定时器
     this._timer = null
     // 滑动时间间隔
@@ -60,50 +61,87 @@ export default class AtTabs extends AtComponent {
   }
 
   handleTouchStart (e) {
+    // console.log("====handleTouchStart=63=== e.touches[0].pageY==>", e.touches[0].pageY)
     const { swipeable, tabDirection } = this.props
     if (!swipeable || tabDirection === 'vertical') return
     // 获取触摸时的原点
     this._touchDot = e.touches[0].pageX
+    this._touchDotY = e.touches[0].pageY
     // 使用js计时器记录时间
-    this._timer = setInterval(() => {
-      this._interval++
-    }, 100)
+    // this._timer = setInterval(() => {
+    //   console.log("====this._interval==70===>",this._interval)
+    //   this._interval++;      
+    // }, 100)
   }
 
-  handleTouchMove (e) {
-    const {
-      swipeable,
-      tabDirection,
-      current,
-      tabList
-    } = this.props
+  // handleTouchMove (e) {
+  //   const {
+  //     swipeable,
+  //     tabDirection,
+  //     current,
+  //     tabList
+  //   } = this.props
+  //   if (!swipeable || tabDirection === 'vertical') return
+
+  //   const touchMove = e.touches[0].pageX
+  //   const touchMoveY = e.touches[0].pageY
+  //   const moveDistance = touchMove - this._touchDot;
+  //   const moveDistanceY = touchMoveY - this._touchDotY;
+  //   const maxIndex = tabList.length
+  //   console.log("=======moveDistanceY====>",moveDistanceY)
+  //   if (!this._isMoving && this._interval < 10) {     
+  //     console.log("======计算==向左====>",current + 1,maxIndex,moveDistance,"<= -40")
+  //     console.log("======计算==向右====>",current -1,maxIndex,moveDistance,">=40")
+  //     // 向左滑动
+  //     if (current + 1 < maxIndex && moveDistance <= -40) {
+  //       console.log("======向左滑动========>")
+  //       this._isMoving = true
+  //       this.handleClick(current + 1)
+        
+  //     // 向右滑动
+  //     } else if (current - 1 >= 0 && moveDistance >= 40) {
+  //       console.log("======向右滑动========>")
+  //       this._isMoving = true
+  //       this.handleClick(current - 1);        
+  //     }
+  //   }
+  // }
+
+  handleTouchEnd (e) {
+    // console.log("======handleTouchEnd====1====>",e)
+    const { swipeable, tabDirection, current,tabList } = this.props
+    // console.log("======handleTouchEnd====2=swipeable====tabDirection=>",swipeable,tabDirection)
     if (!swipeable || tabDirection === 'vertical') return
-
-    const touchMove = e.touches[0].pageX
-    const moveDistance = touchMove - this._touchDot
+    // console.log("====e.changedTouches[0].pageY=>", e.changedTouches[0].pageY)
+    const touchMove = e.changedTouches[0].pageX;
+    const touchMoveY = e.changedTouches[0].pageY
+    const moveDistance = touchMove - this._touchDot;
+    const moveDistanceY = touchMoveY - this._touchDotY;
     const maxIndex = tabList.length
-
-    if (!this._isMoving && this._interval < 10) {
+    // console.log("=======moveDistanceY====>",moveDistanceY)
+    // console.log("=======handleTouchMove=====this._isMoving====this._interval===>",this._isMoving,this._interval);
+    // console.log("=======handleTouchMove====moveDistance===current==>",moveDistance,current,maxIndex)
+    if (!this._isMoving ) {     
+      // console.log("======计算==向左====>",current + 1,maxIndex,moveDistance,"<= -40")
+      // console.log("======计算==向右====>",current -1,maxIndex,moveDistance,">=40")
       // 向左滑动
-      if (current + 1 < maxIndex && moveDistance <= -40) {
+      if ( moveDistanceY <=15 && moveDistanceY >=-15  && current + 1 < maxIndex && moveDistance <= -40) {
+        // console.log("======向左滑动========>")
         this._isMoving = true
         this.handleClick(current + 1)
-
+        
       // 向右滑动
-      } else if (current - 1 >= 0 && moveDistance >= 40) {
+      } else if (moveDistanceY <=15 && moveDistanceY >=-15 && current - 1 >= 0 && moveDistance >= 40) {
+        // console.log("======向右滑动========>")
         this._isMoving = true
-        this.handleClick(current - 1)
+        this.handleClick(current - 1);        
       }
     }
-  }
 
-  handleTouchEnd () {
-    const { swipeable, tabDirection } = this.props
-    if (!swipeable || tabDirection === 'vertical') return
-
-    clearInterval(this._timer)
-    this._interval = 0
-    this._isMoving = false
+    // console.log("======handleTouchEnd==3======>")
+    // clearInterval(this._timer)
+    // this._interval = 0
+    // this._isMoving = false
   }
 
   componentWillReceiveProps (nextProps) {
@@ -191,8 +229,8 @@ export default class AtTabs extends AtComponent {
     const scrollX = tabDirection === 'horizontal'
     const scrollY = tabDirection === 'vertical'
     
-    console.log("=====dddddddd=====>",this.mergeStyle(heightStyle, sticky));
-    console.log("=====scroll=====>",scroll);
+    // console.log("=====dddddddd=====>",this.mergeStyle(heightStyle, sticky));
+    // console.log("=====scroll=====>",scroll);
     return (
       <View
         className={rootCls}
@@ -235,17 +273,18 @@ export default class AtTabs extends AtComponent {
         {
            !scroll && sticky && <View id={this._tabId} className='at-tabs__header_sticky'>{tabItems}</View>
         }
-
-        <View
-          className='at-tabs__body'
-          onTouchStart={this.handleTouchStart.bind(this)}
-          onTouchEnd={this.handleTouchEnd.bind(this)}
-          onTouchMove={this.handleTouchMove.bind(this)}
-          style={this.mergeStyle(bodyStyle, heightStyle)}
-        >
-          <View className='at-tabs__underline' style={underlineStyle}></View>
-          {this.props.children}
+        <View style=" overflow:hidden;width:100%;height:100%;">
+            <View
+              className='at-tabs__body'
+              onTouchStart={this.handleTouchStart.bind(this)}
+              onTouchEnd={this.handleTouchEnd.bind(this)}          
+              style={this.mergeStyle(bodyStyle, heightStyle)}
+            >
+                  <View className='at-tabs__underline' style={underlineStyle}></View>
+                  {this.props.children}
+            </View>
         </View>
+        
       </View>
     )
   }
