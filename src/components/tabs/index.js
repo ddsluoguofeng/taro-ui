@@ -117,12 +117,12 @@ export default class AtTabs extends AtComponent {
       // console.log("======计算==向左====>",current + 1,maxIndex,moveDistance,"<= -40")
       // console.log("======计算==向右====>",current -1,maxIndex,moveDistance,">=40")
       // 向左滑动
-      if ( moveDistanceY <=15 && moveDistanceY >=-15  && current + 1 < maxIndex && moveDistance <= -40) {
+      if ( moveDistanceY <=5 && moveDistanceY >=-5  && current + 1 < maxIndex && moveDistance <= -40) {
         // console.log("======向左滑动========>")
         this._isMoving = true
         this.handleClick(current + 1)        
       // 向右滑动
-      } else if (moveDistanceY <=15 && moveDistanceY >=-15 && current - 1 >= 0 && moveDistance >= 40) {
+      } else if (moveDistanceY <=5 && moveDistanceY >=-5 && current - 1 >= 0 && moveDistance >= 40) {
         // console.log("======向右滑动========>")
         this._isMoving = true
         this.handleClick(current - 1);        
@@ -166,7 +166,8 @@ export default class AtTabs extends AtComponent {
       tabList,
       scroll,
       current,
-      sticky
+      sticky,
+      top
     } = this.props
     const {
       _scrollLeft,
@@ -223,10 +224,10 @@ export default class AtTabs extends AtComponent {
         style={this.mergeStyle(heightStyle, customStyle)}
       >
         {
-          scroll && sticky && <ScrollView
+          scroll && sticky && <ScrollView 
                                 id={this._tabId}
                                 className='at-tabs__header_sticky'
-                                style={heightStyle}
+                                style={this.mergeStyle(heightStyle, {"top":top})}
                                 scrollX={scrollX}
                                 scrollY={scrollY}
                                 scrollWithAnimation
@@ -257,7 +258,7 @@ export default class AtTabs extends AtComponent {
         }
 
         {
-           !scroll && sticky && <View id={this._tabId} className='at-tabs__header_sticky'>{tabItems}</View>
+           !scroll && sticky && <View id={this._tabId} style={"top:"+top} className='at-tabs__header_sticky'>{tabItems}</View>
         }
         <View style=" overflow:hidden;width:100%;height:100%;">
           <View
